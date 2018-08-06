@@ -14,7 +14,8 @@ System.out.println(api.searchChannel("bumblecore").getItems().get(0).getInfo().d
 ```
 
 ## Download
-In a min
+**Latest version**: [GitHub releases](https://github.com/Bumbleboss/youtube_api/releases) [![](https://jitpack.io/v/Bumbleboss/youtube_api.svg)](https://jitpack.io/#Bumbleboss/youtube_api)
+
 
 ## Dependencies
 * [gson-2.8.5](https://github.com/google/gson)
