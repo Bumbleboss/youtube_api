@@ -7,17 +7,15 @@ import com.google.gson.Gson;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import youTubeAPI.core.YTSearch;
 import youTubeAPI.core.YouTubeChannels;
+import youTubeAPI.core.error.YouTubeException;
 import youTubeAPI.core.YouTubeVideos;
 import youTubeAPI.core.error.YouTubeError;
 
 public class YouTubeAPI {
 	
 	private String apikey;
-	private Logger logger = LoggerFactory.getLogger("youtube_api");
 
 	public YouTubeAPI(String key) {
 		this.apikey = key;
@@ -25,7 +23,7 @@ public class YouTubeAPI {
 	
 	private static OkHttpClient client = new OkHttpClient();
 
-	public YTSearch searchVideo(String keyword) {
+	public YTSearch searchVideo(String keyword) throws YouTubeException {
 		String json = null;
 		try{
 			json = getJSONGET("https://www.googleapis.com/youtube/v3/search?part=snippet&q="+keyword+
@@ -37,14 +35,12 @@ public class YouTubeAPI {
 		YTSearch profile = gson.fromJson(json, YTSearch.class);
 		if(profile.kind==null) {
 			YouTubeError err = gson.fromJson(json, YouTubeError.class);
-			logger.error(err.getError().getErrors().get(0).getMessage() +"; " + err.getError().getErrors().get(0).getReason());
-		}else if(profile.getPageInfo().totalResults.equals(0)) {
-			logger.error("Bad request; no results were found");
+			throw new YouTubeException(err.getError().getErrors().get(0).getMessage(), err.getError().getErrors().get(0).getReason());
 		}
 		return profile;
 	}
 	
-	public YTSearch searchChannel(String keyword) {
+	public YTSearch searchChannel(String keyword) throws YouTubeException {
 		String json = null;
 		try{
 			json = getJSONGET("https://www.googleapis.com/youtube/v3/search?part=snippet&q="+keyword+
@@ -56,14 +52,12 @@ public class YouTubeAPI {
 		YTSearch profile = gson.fromJson(json, YTSearch.class);
 		if(profile.kind==null) {
 			YouTubeError err = gson.fromJson(json, YouTubeError.class);
-			logger.error(err.getError().getErrors().get(0).getMessage() +"; " + err.getError().getErrors().get(0).getReason());
-		}else if(profile.getPageInfo().totalResults.equals(0)) {
-			logger.error("Bad request; no results were found");
+			throw new YouTubeException(err.getError().getErrors().get(0).getMessage(), err.getError().getErrors().get(0).getReason());
 		}
 		return profile;
 	}
 	
-	public YouTubeVideos getVideo(String videoId) {
+	public YouTubeVideos getVideo(String videoId) throws YouTubeException {
 		String json = null;
 		try{
 			json = getJSONGET("https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id="+videoId+"&key=" + apikey);
@@ -74,14 +68,12 @@ public class YouTubeAPI {
 		YouTubeVideos profile = gson.fromJson(json, YouTubeVideos.class);
 		if(profile.kind==null) {
 			YouTubeError err = gson.fromJson(json, YouTubeError.class);
-			logger.error(err.getError().getErrors().get(0).getMessage() +"; " + err.getError().getErrors().get(0).getReason());
-		}else if(profile.getPageInfo().totalResults.equals(0)) {
-			logger.error("Bad request; no results were found");
+			throw new YouTubeException(err.getError().getErrors().get(0).getMessage(), err.getError().getErrors().get(0).getReason());
 		}
 		return profile;
 	}
 	
-	public YouTubeChannels getChannel(String channelId) {
+	public YouTubeChannels getChannel(String channelId) throws YouTubeException {
 		String json = null;
 		try{
 			json = getJSONGET("https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,brandingSettings&id="+channelId+"&key=" + apikey);
@@ -92,9 +84,7 @@ public class YouTubeAPI {
 		YouTubeChannels profile = gson.fromJson(json, YouTubeChannels.class);
 		if(profile.kind==null) {
 			YouTubeError err = gson.fromJson(json, YouTubeError.class);
-			logger.error(err.getError().getErrors().get(0).getMessage() +"; " + err.getError().getErrors().get(0).getReason());
-		}else if(profile.getPageInfo().totalResults.equals(0)) {
-			logger.error("Bad request; no results were found");
+			throw new YouTubeException(err.getError().getErrors().get(0).getMessage(), err.getError().getErrors().get(0).getReason());
 		}
 		return profile;
 	}
